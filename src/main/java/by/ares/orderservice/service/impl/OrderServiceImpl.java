@@ -4,11 +4,13 @@ import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.SpecificationRequest;
 import by.ares.orderservice.dto.request.StatusRequest;
 import by.ares.orderservice.dto.response.OrderDto;
+import by.ares.orderservice.dto.response.UserDto;
 import by.ares.orderservice.exception.OrderNotFoundException;
 import by.ares.orderservice.mapper.OrderMapper;
 import by.ares.orderservice.model.Order;
 import by.ares.orderservice.model.Status;
 import by.ares.orderservice.repository.OrderRepository;
+import by.ares.orderservice.service.ApiClientService;
 import by.ares.orderservice.service.OrderService;
 import by.ares.orderservice.service.SpecificationBuilderService;
 import lombok.RequiredArgsConstructor;
@@ -21,23 +23,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static by.ares.orderservice.util.OrderServiceConstants.ORDER_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final ApiClientService apiClientService;
     private final SpecificationBuilderService<Order> specificationBuilderService;
     private final OrderMapper orderMapper;
 
-    private static final String ORDER_NOT_FOUND = "Order not found";
-
     @Override
     public List<OrderDto> findAllByUserId(Long userId) {
-        return orderRepository.findAllByUserId(userId)
+        List<OrderDto> orders = orderRepository.findAllByUserId(userId)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
+        UserDto userDto = apiClientService.findUserById(userId);
+        orders.forEach(x -> x.setUserDto(userDto));
+        return orders;
     }
 
     @Override
@@ -53,9 +59,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto findById(Long id) {
-        return orderRepository.findById(id)
+        OrderDto orderDto = orderRepository.findById(id)
                 .map(orderMapper::toDto)
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+        orderDto.setUserDto(apiClientService.findUserById(id));
+        return orderDto;
     }
 
     @Override

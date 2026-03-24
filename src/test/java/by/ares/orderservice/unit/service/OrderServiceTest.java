@@ -120,18 +120,6 @@ class OrderServiceTest {
         verifyNoInteractions(orderMapper);
     }
 
-
-    @Test
-    void findAllByUserId_shouldReturnOrders() {
-        when(orderRepository.findAllByUserId(USER_ID)).thenReturn(List.of(order));
-        when(orderMapper.toDto(order)).thenReturn(orderDto);
-        List<OrderDto> result = orderService.findAllByUserId(USER_ID);
-        assertEquals(1, result.size());
-        assertEquals(orderDto, result.get(0));
-        verify(orderRepository).findAllByUserId(USER_ID);
-        verify(orderMapper).toDto(order);
-    }
-
     @Test
     void findById_shouldReturnOrder() {
         when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));

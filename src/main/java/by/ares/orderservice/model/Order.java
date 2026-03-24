@@ -54,7 +54,8 @@ public class Order {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "orders", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "orders", fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
     @PrePersist
