@@ -22,7 +22,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<Page<OrderDto>> findAll(SpecificationRequest specificationRequest,
+    public ResponseEntity<Page<OrderDto>> findAll(@ModelAttribute SpecificationRequest specificationRequest,
                                                   @PageableDefault Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -48,14 +48,6 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(orderService.save(orderRequest));
-    }
-
-    @PutMapping("{/id}")
-    public ResponseEntity<Long> update(@PathVariable Long id,
-                                       @RequestBody OrderRequest orderRequest) {
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(orderService.update(orderRequest, id));
     }
 
     @DeleteMapping("{/id}")

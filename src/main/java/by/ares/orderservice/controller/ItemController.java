@@ -4,6 +4,7 @@ import by.ares.orderservice.dto.request.ItemRequest;
 import by.ares.orderservice.dto.request.StatusRequest;
 import by.ares.orderservice.dto.response.ItemDto;
 import by.ares.orderservice.service.ItemService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> save(@RequestBody ItemRequest itemRequest) {
+    public ResponseEntity<Long> save(@Valid @RequestBody ItemRequest itemRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(itemService.save(itemRequest));
@@ -42,18 +43,10 @@ public class ItemController {
 
     @PutMapping("{/id}")
     public ResponseEntity<Long> update(@PathVariable Long id,
-                                       @RequestBody ItemRequest itemRequest) {
+                                       @Valid @RequestBody ItemRequest itemRequest) {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(itemService.update(itemRequest, id));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Long> changeStatus(@PathVariable Long id,
-                                             @RequestBody StatusRequest statusRequest) {
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(itemService.changeStatus(id, statusRequest));
     }
 
     @DeleteMapping("{/id}")

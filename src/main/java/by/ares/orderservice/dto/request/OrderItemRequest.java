@@ -1,4 +1,4 @@
-package by.ares.orderservice.dto.response;
+package by.ares.orderservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemDto {
-    private Long id;
-    private String name;
-    private Long price;
+public class OrderItemRequest {
+    private Integer quantity;
+    private ItemRequest itemRequest;
 }

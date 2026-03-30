@@ -12,3 +12,20 @@ spring:
     properties:
       hibernate:
         show_sql: "true"
+resilience4j.circuitbreaker:
+  instances:
+    userService:
+      slidingWindowSize: 10
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+resilience4j.retry:
+  instances:
+    userService:
+      maxAttempts: 5
+      waitDuration: 500ms
+      retryExceptions:
+        - by.ares.orderservice.exception.ExternalApiException
+resilience4j.bulkhead:
+  instances:
+    userService:
+      maxConcurrentCalls: 5

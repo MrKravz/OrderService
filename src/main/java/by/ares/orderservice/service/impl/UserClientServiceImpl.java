@@ -5,6 +5,9 @@ import by.ares.orderservice.exception.ExceptionResponse;
 import by.ares.orderservice.exception.ExternalApiException;
 import by.ares.orderservice.exception.ResponseParseException;
 import by.ares.orderservice.service.ApiClientService;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static by.ares.orderservice.util.OrderServiceConstants.FIND_ALL_METHOD_PREFIX;
 import static by.ares.orderservice.util.OrderServiceConstants.RESPONSE_PARSE_MESSAGE;
-import static by.ares.orderservice.util.OrderServiceConstants.USER_URI;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +41,13 @@ public class UserClientServiceImpl implements ApiClientService {
     }
 
     @Override
+    @Retry(name = "userService")
+    @Bulkhead(name = "userService", type = Bulkhead.Type.SEMAPHORE)
+    @CircuitBreaker(name = "userService", fallbackMethod = "fallbackFindAllByIdList")
     public List<UserDto> findAllByIdList(List<Long> idList) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(USER_URI)
+                        .path(uri + FIND_ALL_METHOD_PREFIX)
                         .queryParam("id", idList.toArray())
                         .build())
                 .retrieve()
@@ -57,10 +63,17 @@ public class UserClientServiceImpl implements ApiClientService {
                 .body(new ParameterizedTypeReference<>() {});
     }
 
+    private List<UserDto> fallbackFindAllByIdList(List<Long> idList, Throwable t) {
+        throw new ExternalApiException("Can't access api");
+    }
+
     @Override
+    @Retry(name = "userService")
+    @Bulkhead(name = "userService", type = Bulkhead.Type.SEMAPHORE)
+    @CircuitBreaker(name = "userService", fallbackMethod = "fallbackFindUserById")
     public UserDto findUserById(Long id) {
         return restClient.get()
-                .uri(USER_URI + "/" + id)
+                .uri(uri + "/" + id)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
                     ExceptionResponse error;
@@ -72,6 +85,10 @@ public class UserClientServiceImpl implements ApiClientService {
                     throw new ExternalApiException(error.getMessage());
                 })
                 .body(UserDto.class);
+    }
+
+    private UserDto fallbackFindUserById(Long id, Throwable t) {
+        throw new ExternalApiException("Can't access api");
     }
 
 }

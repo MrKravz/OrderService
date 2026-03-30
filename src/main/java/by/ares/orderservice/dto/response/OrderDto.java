@@ -15,7 +15,7 @@ import java.util.List;
 public class OrderDto {
     private Long id;
     private Status status;
-    private Float totalPrice;
+    private Long totalPrice;
     private Boolean deleted;
     private UserDto userDto;
     private List<ItemDto> items;

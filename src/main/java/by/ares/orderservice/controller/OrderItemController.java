@@ -25,7 +25,7 @@ public class OrderItemController {
 
     @PostMapping("/remove-item/{itemId}")
     public ResponseEntity<OrderDto> removeItem(@PathVariable Long orderId,
-                                             @PathVariable Long itemId) {
+                                                @PathVariable Long itemId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(orderItemService.removeItemFromOrder(orderId, itemId));

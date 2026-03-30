@@ -2,8 +2,8 @@ package by.ares.orderservice.model;
 
 public enum Status {
     CREATED,
-    AWAITED,
+    WAITING,
     CONFIRMED,
     READY,
     DONE
-} // TODO refactor
+}

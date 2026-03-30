@@ -7,6 +7,9 @@ import by.ares.orderservice.dto.response.OrderDto;
 import java.util.List;
 
 public interface OrderService extends SpecificationService<OrderDto>,
-        StatusChangerService<Long, StatusRequest>, CrudService<OrderDto, OrderRequest, Long> {
+        StatusChangerService<Long, StatusRequest> {
     List<OrderDto> findAllByUserId(Long userId);
+    OrderDto findById(Long id);
+    Long save(OrderRequest orderRequest);
+    void delete(Long id);
 }

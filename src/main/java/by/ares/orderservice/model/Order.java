@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "orders")
 @Accessors(chain = true)
-@SQLRestriction("deleted = 'true'")
+@SQLRestriction("deleted = 'false'")
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
 
@@ -36,7 +36,7 @@ public class Order {
     private Status status;
 
     @Column(name = "total_price")
-    private Double totalPrice;
+    private Long totalPrice;
 
     @Column(name = "deleted")
     private Boolean deleted = false;
@@ -78,7 +78,7 @@ public class Order {
 
     public void recalculateTotalPrice() {
         this.totalPrice = items.stream()
-                .mapToDouble(oi -> oi.getItem().getPrice() * oi.getQuantity())
+                .mapToLong(oi -> oi.getItem().getPrice() * oi.getQuantity())
                 .sum();
     }
 

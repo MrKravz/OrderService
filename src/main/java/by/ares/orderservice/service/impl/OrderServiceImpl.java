@@ -96,16 +96,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Long save(OrderRequest orderRequest) {
-        return orderRepository.save(orderMapper.toModel(orderRequest))
+        var order = orderMapper.toModel(orderRequest);
+        order.setStatus(Status.WAITING);
+        return orderRepository.save(order)
                 .getId();
-    }
-
-    @Override
-    @Transactional
-    public Long update(OrderRequest orderRequest, Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        return id;
     }
 
     @Override

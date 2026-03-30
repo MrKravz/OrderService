@@ -32,7 +32,7 @@ public class Item {
     private String name;
 
     @Column(name = "price")
-    private Float price;
+    private Long price;
 
     @Column(name = "created_at")
     @CreatedDate
@@ -47,5 +47,11 @@ public class Item {
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY,
     cascade = CascadeType.ALL)
     private List<OrderItem> orders;
+
+    public Item setPrice(Long price) {
+        this.price = price;
+        orders.forEach(x->x.getOrder().recalculateTotalPrice());
+        return this;
+    }
 
 }
