@@ -3,6 +3,7 @@ package by.ares.orderservice.util;
 import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.StatusRequest;
 import by.ares.orderservice.dto.response.OrderDto;
+import by.ares.orderservice.dto.response.UserDto;
 import by.ares.orderservice.model.Item;
 import by.ares.orderservice.model.Order;
 import by.ares.orderservice.model.OrderItem;
@@ -46,6 +47,22 @@ public class TestModelBuilder {
         return OrderRequest.builder()
                 .status(Status.CREATED)
                 .userId(10L)
+                .build();
+    }
+
+    public static UserDto buildUserDto() {
+        return UserDto.builder()
+                .id(USER_ID)
+                .name(USER_NAME)
+                .active(ACTIVATION_STATUS)
+                .build();
+    }
+
+    public static UserDto buildChangedUserDto() {
+        return UserDto.builder()
+                .id(USER_ID_2)
+                .name(USER_NAME)
+                .active(ACTIVATION_STATUS)
                 .build();
     }
 

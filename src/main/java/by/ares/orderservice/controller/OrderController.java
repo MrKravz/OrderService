@@ -2,7 +2,6 @@ package by.ares.orderservice.controller;
 
 import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.SpecificationRequest;
-import by.ares.orderservice.dto.request.StatusRequest;
 import by.ares.orderservice.dto.response.OrderDto;
 import by.ares.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -57,14 +56,6 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(orderService.update(orderRequest, id));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Long> changeStatus(@PathVariable Long id,
-                                             @RequestBody StatusRequest statusRequest) {
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(orderService.changeStatus(id, statusRequest));
     }
 
     @DeleteMapping("{/id}")

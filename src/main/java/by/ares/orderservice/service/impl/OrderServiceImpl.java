@@ -15,19 +15,22 @@ import by.ares.orderservice.service.OrderService;
 import by.ares.orderservice.service.SpecificationBuilderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static by.ares.orderservice.util.OrderServiceConstants.ORDER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -48,13 +51,37 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDto> findAll(SpecificationRequest specificationRequest, Pageable pageable) {
-        if (specificationRequest == null) {
-            return orderRepository.findAll(pageable)
-                    .map(orderMapper::toDto);
+        Page<Order> resultPage = findOrders(specificationRequest, pageable);
+        Map<Long, UserDto> userMap = findUsers(resultPage);
+        var pageContent = resultPage.getContent()
+                .stream()
+                .map(order -> mapToDto(order, userMap))
+                .toList();
+        return new PageImpl<>(pageContent, pageable, resultPage.getTotalElements());
+    }
+    private Page<Order> findOrders(SpecificationRequest request, Pageable pageable) {
+        if (request == null) {
+            return orderRepository.findAll(pageable);
         }
-        Specification<Order> specification = specificationBuilderService.configure(specificationRequest);
-        return orderRepository.findAll(specification, pageable)
-                .map(orderMapper::toDto);
+        Specification<Order> specification = specificationBuilderService.configure(request);
+        return orderRepository.findAll(specification, pageable);
+    }
+    private Map<Long, UserDto> findUsers(Page<Order> orderPage) {
+        List<Long> idList = orderPage.stream()
+                .map(Order::getUserId)
+                .distinct()
+                .toList();
+        if (idList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return apiClientService.findAllByIdList(idList)
+                .stream()
+                .collect(Collectors.toMap(UserDto::getId, x -> x));
+    }
+    private OrderDto mapToDto(Order order, Map<Long, UserDto> userMap) {
+        OrderDto dto = orderMapper.toDto(order);
+        dto.setUserDto(userMap.get(order.getUserId()));
+        return dto;
     }
 
     @Override
