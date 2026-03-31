@@ -9,7 +9,6 @@ public class TestConstants {
     public static final Long ORDER_ITEM_ID = 1L;
     public static final String ITEM_NAME = "Item name";
     public static final Long PRICE = 124L;
-    public static final Status CREATED = Status.CREATED;
     public static final Status AWAITED = Status.WAITING;
     public static final Status DONE = Status.DONE;
     public static final Long USER_ID = 1L;

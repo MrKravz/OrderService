@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -46,11 +47,11 @@ public class Item {
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY,
     cascade = CascadeType.ALL)
-    private List<OrderItem> orders;
+    private List<OrderItem> orders = new ArrayList<>();
 
     public Item setPrice(Long price) {
         this.price = price;
-        orders.forEach(x->x.getOrder().recalculateTotalPrice());
+        orders.forEach(x->x.getOrder().calculateTotalPrice());
         return this;
     }
 

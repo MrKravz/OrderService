@@ -37,23 +37,27 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public Long save(ItemRequest itemRequest) {
-        return itemRepository.save(itemMapper.toModel(itemRequest)).getId();
+    public ItemDto save(ItemRequest itemRequest) {
+        var item = itemMapper.toModel(itemRequest);
+        return itemMapper.toDto(itemRepository.save(item));
     }
 
     @Override
     @Transactional
-    public Long update(ItemRequest itemRequest, Long id) {
+    public ItemDto update(ItemRequest itemRequest, Long id) {
         var item = itemRepository.findById(id)
                 .orElseThrow( () -> new ItemNotFoundException(ITEM_NOT_FOUND_EXCEPTION));
         item.setName(itemRequest.getName())
                 .setPrice(item.getPrice());
-        return itemRepository.save(item).getId();
+        return itemMapper.toDto(itemRepository.save(item));
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        var item = itemRepository.findById(id)
+                .orElseThrow( () -> new ItemNotFoundException(ITEM_NOT_FOUND_EXCEPTION));
+        item.getOrders().forEach(orderItem -> orderItem.getOrder().removeOrderItem(orderItem));
         itemRepository.deleteById(id);
     }
 

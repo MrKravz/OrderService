@@ -11,6 +11,7 @@ import by.ares.orderservice.model.OrderItem;
 import by.ares.orderservice.repository.ItemRepository;
 import by.ares.orderservice.repository.OrderItemRepository;
 import by.ares.orderservice.repository.OrderRepository;
+import by.ares.orderservice.service.ApiClientService;
 import by.ares.orderservice.service.impl.OrderItemServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ class OrderItemServiceTest {
     private OrderItemRepository orderItemRepository;
     @Mock
     private OrderMapper orderMapper;
+    @Mock
+    private ApiClientService apiClientService;
 
     @InjectMocks
     private OrderItemServiceImpl orderItemService;
@@ -128,7 +131,7 @@ class OrderItemServiceTest {
         orderItem.setQuantity(1);
         when(orderItemRepository.findByOrderIdAndItemId(ORDER_ID, ITEM_ID))
                 .thenReturn(Optional.of(orderItem));
-        when(orderMapper.toDto(order)).thenReturn(orderDto);
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
         OrderDto result = orderItemService.removeItemFromOrder(ORDER_ID, ITEM_ID);
         assertEquals(orderDto, result);
         verify(orderItemRepository).delete(orderItem);

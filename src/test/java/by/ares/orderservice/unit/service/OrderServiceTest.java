@@ -2,14 +2,15 @@ package by.ares.orderservice.unit.service;
 
 import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.SpecificationRequest;
-import by.ares.orderservice.dto.request.StatusRequest;
 import by.ares.orderservice.dto.response.OrderDto;
+import by.ares.orderservice.dto.response.UserDto;
 import by.ares.orderservice.exception.OrderNotFoundException;
 import by.ares.orderservice.mapper.OrderMapper;
 import by.ares.orderservice.model.Order;
 import by.ares.orderservice.repository.OrderRepository;
-import by.ares.orderservice.service.impl.OrderServiceImpl;
+import by.ares.orderservice.service.ApiClientService;
 import by.ares.orderservice.service.SpecificationBuilderService;
+import by.ares.orderservice.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static by.ares.orderservice.util.TestConstants.*;
+import static by.ares.orderservice.util.TestConstants.ORDER_ID;
+import static by.ares.orderservice.util.TestConstants.USER_ID;
 import static by.ares.orderservice.util.TestModelBuilder.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -40,18 +42,22 @@ class OrderServiceTest {
     private SpecificationBuilderService<Order> specificationBuilderService;
     @Mock
     private OrderMapper orderMapper;
+    @Mock
+    private ApiClientService apiClientService;
 
     @InjectMocks
     private OrderServiceImpl orderService;
 
     private Order order;
     private OrderDto orderDto;
+    private UserDto userDto;
 
 
     @BeforeEach
     void setUp() {
         order = buildOrder();
         orderDto = buildOrderDto();
+        userDto = buildUserDto();
     }
 
     @Test
@@ -139,15 +145,14 @@ class OrderServiceTest {
         OrderRequest request = buildOrderRequest();
         when(orderMapper.toModel(request)).thenReturn(order);
         when(orderRepository.save(order)).thenReturn(order);
-        Long id = orderService.save(request);
-        assertEquals(ORDER_ID, id);
+        when(orderMapper.toDto(order)).thenReturn(orderDto);
+        OrderDto orderDto = orderService.save(request);
+        assertEquals(orderDto, this.orderDto);
         verify(orderRepository).save(order);
     }
 
     @Test
     void delete_shouldMarkOrderDeleted() {
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
-        when(orderRepository.save(order)).thenReturn(order);
         orderService.delete(ORDER_ID);
         assertTrue(order.getDeleted());
     }
@@ -158,25 +163,5 @@ class OrderServiceTest {
         assertThrows(OrderNotFoundException.class, () -> orderService.delete(ORDER_ID));
     }
 
-    @Test
-    void changeStatus_shouldUpdateStatus() {
-        StatusRequest statusRequest = buildStatusRequest();
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
-        when(orderRepository.save(order)).thenReturn(order);
-        Long id = orderService.changeStatus(ORDER_ID, statusRequest);
-        assertEquals(AWAITED, order.getStatus());
-        assertEquals(ORDER_ID, id);
-    }
-
-    @Test
-    void changeStatus_shouldDeleteWhenDone() {
-        StatusRequest statusRequest = buildStatusRequest();
-        statusRequest.setStatus(DONE);
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
-        when(orderRepository.save(order)).thenReturn(order);
-        Long id = orderService.changeStatus(ORDER_ID, statusRequest);
-        assertTrue(order.getDeleted());
-        assertEquals(ORDER_ID, id);
-    }
 
 }

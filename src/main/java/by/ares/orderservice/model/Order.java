@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static by.ares.orderservice.util.OrderServiceConstants.DEFAULT_TOTAL_PRICE_VALUE;
+
 @Entity
 @Getter
 @Setter
@@ -25,6 +28,7 @@ import java.util.List;
 @Accessors(chain = true)
 @SQLRestriction("deleted = 'false'")
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE orders SET deleted = true WHERE id=?")
 public class Order {
 
     @Id
@@ -54,32 +58,28 @@ public class Order {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "orders", fetch = FetchType.LAZY,
-    cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
-
-    @PrePersist
-    @PreUpdate
-    public void prePersist() {
-        recalculateTotalPrice();
-    }
 
     public void addOrderItem(OrderItem item) {
         items.add(item);
         item.setOrder(this);
-        recalculateTotalPrice();
+        calculateTotalPrice();
     }
 
     public void removeOrderItem(OrderItem item) {
         items.remove(item);
         item.setOrder(null);
-        recalculateTotalPrice();
+        calculateTotalPrice();
     }
 
-    public void recalculateTotalPrice() {
-        this.totalPrice = items.stream()
-                .mapToLong(oi -> oi.getItem().getPrice() * oi.getQuantity())
-                .sum();
+    public void calculateTotalPrice() {
+        totalPrice = DEFAULT_TOTAL_PRICE_VALUE;
+        if (getItems().isEmpty()) return;
+        items.forEach(orderItem -> {
+            totalPrice += orderItem.getItem().getPrice() * orderItem.getQuantity();
+        });
     }
 
 }

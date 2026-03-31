@@ -18,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static by.ares.orderservice.util.OrderServiceConstants.*;
 
 @Service
@@ -35,35 +33,45 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public OrderDto addItemToOrder(Long orderId, Long itemId) {
-        OrderItem resultOrderItem = incrementOrCreate(
-                orderItemRepository.findByOrderIdAndItemId(orderId, itemId), orderId, itemId
-        );
-
-        return saveAndMapOrderItem(resultOrderItem);
+        var resultOrderItem = orderItemRepository.findByOrderIdAndItemId(orderId, itemId);
+        if (resultOrderItem.isPresent()) {
+            OrderItem result = incrementOrderItem(resultOrderItem.get());
+            orderItemRepository.save(result);
+            return mapOrderDto(result.getOrder());
+        }
+        OrderItem resultOrder = createOrderItem(orderId, itemId);
+        orderItemRepository.save(resultOrder);
+        return mapOrderDto(resultOrder.getOrder());
     }
 
     @Override
     public OrderDto removeItemFromOrder(Long orderId, Long itemId) {
         OrderItem orderItem = orderItemRepository.findByOrderIdAndItemId(orderId, itemId)
                 .orElseThrow(() -> new OrderItemNotFoundException(ORDER_ITEM_NOT_FOUND));
-        final int decrementValue = 1;
         if (orderItem.getQuantity() > 1) {
-            orderItem.setQuantity(orderItem.getQuantity() - decrementValue);
-            return saveAndMapOrderItem(orderItem);
+            decrementOrderItem(orderItem);
+            Order resultOrder = orderItemRepository.save(orderItem).getOrder();
+            return mapOrderDto(resultOrder);
         }
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+        Order order = orderItem.getOrder();
         order.removeOrderItem(orderItem);
-        return deleteAndMapOrderItem(orderItem);
+        orderItemRepository.delete(orderItem);
+        return mapOrderDto(order);
     }
 
-    private OrderItem incrementOrCreate(Optional<OrderItem> resultOrderItem, Long orderId, Long itemId) {
+    private OrderItem incrementOrderItem(OrderItem resultOrderItem) {
         final int incrementValue = 1;
-        if (resultOrderItem.isPresent()) {
-            OrderItem orderItem = resultOrderItem.get();
-            orderItem.setQuantity(orderItem.getQuantity() + incrementValue);
-            return orderItem;
-        }
+        resultOrderItem.setQuantity(resultOrderItem.getQuantity() + incrementValue);
+        return resultOrderItem;
+    }
+
+    private void decrementOrderItem(OrderItem orderItem) {
+        final int decrementValue = 1;
+        orderItem.setQuantity(orderItem.getQuantity() - decrementValue);
+    }
+
+    private OrderItem createOrderItem(Long orderId, Long itemId) {
+        final int defaultValue = 1;
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
         Order order = orderRepository.findById(orderId)
@@ -71,23 +79,14 @@ public class OrderItemServiceImpl implements OrderItemService {
         OrderItem orderItem = new OrderItem()
                 .setOrder(order)
                 .setItem(item)
-                .setQuantity(incrementValue);
+                .setQuantity(defaultValue);
         order.addOrderItem(orderItem);
         return orderItem;
     }
 
-    private OrderDto saveAndMapOrderItem(OrderItem orderItem) {
-        Order resultOrder = orderItemRepository.save(orderItem).getOrder();
-        OrderDto orderDto = orderMapper.toDto(resultOrder);
-        UserDto userDto = apiClientService.findUserById(resultOrder.getUserId());
-        orderDto.setUserDto(userDto);
-        return orderDto;
-    }
-
-    private OrderDto deleteAndMapOrderItem(OrderItem orderItem) {
-        orderItemRepository.delete(orderItem);
-        OrderDto orderDto = orderMapper.toDto(orderItem.getOrder());
-        UserDto userDto = apiClientService.findUserById(orderItem.getOrder().getUserId());
+    private OrderDto mapOrderDto(Order order) {
+        OrderDto orderDto = orderMapper.toDto(order);
+        UserDto userDto = apiClientService.findUserById(order.getUserId());
         orderDto.setUserDto(userDto);
         return orderDto;
     }

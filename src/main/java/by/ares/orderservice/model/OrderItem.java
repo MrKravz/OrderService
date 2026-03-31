@@ -48,4 +48,10 @@ public class OrderItem {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime updatedAt;
 
+    public OrderItem setQuantity(Integer quantity) {
+        this.quantity = quantity;
+        order.calculateTotalPrice();
+        return this;
+    }
+
 }

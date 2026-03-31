@@ -2,7 +2,6 @@ package by.ares.orderservice.service.impl;
 
 import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.SpecificationRequest;
-import by.ares.orderservice.dto.request.StatusRequest;
 import by.ares.orderservice.dto.response.OrderDto;
 import by.ares.orderservice.dto.response.UserDto;
 import by.ares.orderservice.exception.OrderNotFoundException;
@@ -59,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
         return new PageImpl<>(pageContent, pageable, resultPage.getTotalElements());
     }
+
     private Page<Order> findOrders(SpecificationRequest request, Pageable pageable) {
         if (request == null) {
             return orderRepository.findAll(pageable);
@@ -66,6 +66,7 @@ public class OrderServiceImpl implements OrderService {
         Specification<Order> specification = specificationBuilderService.configure(request);
         return orderRepository.findAll(specification, pageable);
     }
+
     private Map<Long, UserDto> findUsers(Page<Order> orderPage) {
         List<Long> idList = orderPage.stream()
                 .map(Order::getUserId)
@@ -78,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .collect(Collectors.toMap(UserDto::getId, x -> x));
     }
+
     private OrderDto mapToDto(Order order, Map<Long, UserDto> userMap) {
         OrderDto dto = orderMapper.toDto(order);
         dto.setUserDto(userMap.get(order.getUserId()));
@@ -86,42 +88,42 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto findById(Long id) {
-        OrderDto orderDto = orderRepository.findById(id)
-                .map(orderMapper::toDto)
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        orderDto.setUserDto(apiClientService.findUserById(id));
+        OrderDto orderDto = orderMapper.toDto(order);
+        orderDto.setUserDto(apiClientService.findUserById(order.getUserId()));
         return orderDto;
     }
 
     @Override
     @Transactional
-    public Long save(OrderRequest orderRequest) {
+    public OrderDto save(OrderRequest orderRequest) {
         var order = orderMapper.toModel(orderRequest);
         order.setStatus(Status.WAITING);
-        return orderRepository.save(order)
-                .getId();
+        var result = orderMapper.toDto(orderRepository.save(order));
+       return assignOwner(result, order.getUserId());
+    }
+
+    @Override
+    @Transactional
+    public OrderDto update(OrderRequest request, Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+        order.setStatus(request.getStatus());
+        var result = orderMapper.toDto(orderRepository.save(order));
+        return assignOwner(result, order.getUserId());
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        order.setDeleted(true);
-        orderRepository.save(order);
+        orderRepository.deleteById(id);
     }
 
-    @Override
-    @Transactional
-    public Long changeStatus(Long id, StatusRequest status) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        order.setStatus(status.getStatus());
-        if (status.getStatus().equals(Status.DONE)) {
-            delete(id);
-            return id;
-        }
-        return orderRepository.save(order).getId();
+    private OrderDto assignOwner(OrderDto orderDto, Long userId) {
+        var user = apiClientService.findUserById(userId);
+        orderDto.setUserDto(user);
+        return orderDto;
     }
 
 }
