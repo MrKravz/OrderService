@@ -25,7 +25,8 @@ import java.util.Optional;
 import static by.ares.orderservice.util.TestConstants.ITEM_ID;
 import static by.ares.orderservice.util.TestConstants.ORDER_ID;
 import static by.ares.orderservice.util.TestModelBuilder.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -129,9 +130,8 @@ class OrderItemServiceTest {
     @Test
     void removeItemFromOrder_shouldDelete_whenQuantityIsOne() {
         orderItem.setQuantity(1);
-        when(orderItemRepository.findByOrderIdAndItemId(ORDER_ID, ITEM_ID))
-                .thenReturn(Optional.of(orderItem));
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
+        when(orderItemRepository.findByOrderIdAndItemId(ORDER_ID, ITEM_ID)).thenReturn(Optional.of(orderItem));
+        when(orderMapper.toDto(order)).thenReturn(orderDto);
         OrderDto result = orderItemService.removeItemFromOrder(ORDER_ID, ITEM_ID);
         assertEquals(orderDto, result);
         verify(orderItemRepository).delete(orderItem);
@@ -140,10 +140,8 @@ class OrderItemServiceTest {
 
     @Test
     void removeItemFromOrder_shouldThrow_whenNotFound() {
-        when(orderItemRepository.findByOrderIdAndItemId(ORDER_ID, ITEM_ID))
-                .thenReturn(Optional.empty());
-        assertThrows(OrderItemNotFoundException.class,
-                () -> orderItemService.removeItemFromOrder(ORDER_ID, ITEM_ID));
+        when(orderItemRepository.findByOrderIdAndItemId(ORDER_ID, ITEM_ID)).thenReturn(Optional.empty());
+        assertThrows(OrderItemNotFoundException.class, () -> orderItemService.removeItemFromOrder(ORDER_ID, ITEM_ID));
     }
 
 }

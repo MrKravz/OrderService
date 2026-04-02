@@ -6,7 +6,7 @@ import by.ares.orderservice.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<Page<ItemDto>> findAll(@PageableDefault PageRequest pageable) {
+    public ResponseEntity<Page<ItemDto>> findAll(@PageableDefault Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(itemService.findAll(pageable));

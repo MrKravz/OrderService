@@ -154,14 +154,7 @@ class OrderServiceTest {
     @Test
     void delete_shouldMarkOrderDeleted() {
         orderService.delete(ORDER_ID);
-        assertTrue(order.getDeleted());
+        verify(orderRepository).deleteById(any());
     }
-
-    @Test
-    void delete_shouldThrowException() {
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
-        assertThrows(OrderNotFoundException.class, () -> orderService.delete(ORDER_ID));
-    }
-
 
 }

@@ -6,7 +6,7 @@ import by.ares.orderservice.dto.response.OrderDto;
 import by.ares.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<Page<OrderDto>> findAll(@ModelAttribute SpecificationRequest specificationRequest,
-                                                  @PageableDefault PageRequest pageable) {
+                                                  @PageableDefault Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(orderService.findAll(specificationRequest, pageable));

@@ -6,8 +6,8 @@ import by.ares.orderservice.model.Status;
 public class TestConstants {
     public static final Long ORDER_ID = 1L;
     public static final Long ITEM_ID = 1L;
-    public static final Long ORDER_ITEM_ID = 1L;
     public static final String ITEM_NAME = "Item name";
+    public static final String UPDATED_ITEM_NAME = "Updated name";
     public static final Long PRICE = 124L;
     public static final Status AWAITED = Status.WAITING;
     public static final Status DONE = Status.DONE;

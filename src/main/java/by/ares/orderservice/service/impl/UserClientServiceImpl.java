@@ -15,6 +15,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class UserClientServiceImpl implements ApiClientService {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
-    @Value("${USER_URI:}")
+    @Value("${api.user.uri}")
     private String uri;
 
     @PostConstruct
@@ -45,11 +46,10 @@ public class UserClientServiceImpl implements ApiClientService {
     @Bulkhead(name = "userService", type = Bulkhead.Type.SEMAPHORE)
     @CircuitBreaker(name = "userService", fallbackMethod = "fallbackFindAllByIdList")
     public List<UserDto> findAllByIdList(List<Long> idList) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uri + FIND_ALL_METHOD_PREFIX);
+        idList.forEach(id -> builder.queryParam("usersId", id));
         return restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(uri + FIND_ALL_METHOD_PREFIX)
-                        .queryParam("id", idList.toArray())
-                        .build())
+                .uri(builder.build().toUri())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
                     ExceptionResponse error;
@@ -60,7 +60,8 @@ public class UserClientServiceImpl implements ApiClientService {
                     }
                     throw new ExternalApiException(error.getMessage());
                 })
-                .body(new ParameterizedTypeReference<>() {});
+                .body(new ParameterizedTypeReference<>() {
+                });
     }
 
     private List<UserDto> fallbackFindAllByIdList(List<Long> idList, Throwable t) {

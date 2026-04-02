@@ -1,7 +1,9 @@
 package by.ares.orderservice.util;
 
+import by.ares.orderservice.dto.request.ItemRequest;
 import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.StatusRequest;
+import by.ares.orderservice.dto.response.ItemDto;
 import by.ares.orderservice.dto.response.OrderDto;
 import by.ares.orderservice.dto.response.UserDto;
 import by.ares.orderservice.model.Item;
@@ -14,21 +16,31 @@ public class TestModelBuilder {
 
     public static Order buildOrder() {
         return new Order()
-                .setId(ORDER_ID)
                 .setStatus(AWAITED)
                 .setUserId(USER_ID);
     }
 
     public static Item buildItem() {
         return new Item()
+                .setName(ITEM_NAME)
+                .setPrice(PRICE);
+    }
+
+    public static ItemDto buildItemDto() {
+        return new ItemDto()
                 .setId(ITEM_ID)
+                .setName(ITEM_NAME)
+                .setPrice(PRICE);
+    }
+
+    public static ItemRequest buildItemRequest() {
+        return new ItemRequest()
                 .setName(ITEM_NAME)
                 .setPrice(PRICE);
     }
 
     public static OrderItem buildOrderItem(Order order, Item item, int quantity) {
         var result = new OrderItem()
-                .setId(ORDER_ITEM_ID)
                 .setItem(item)
                 .setOrder(order)
                 .setQuantity(quantity);
@@ -48,7 +60,7 @@ public class TestModelBuilder {
     public static OrderRequest buildOrderRequest() {
         return OrderRequest.builder()
                 .status(AWAITED)
-                .userId(10L)
+                .userId(USER_ID)
                 .build();
     }
 
