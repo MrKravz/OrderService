@@ -3,7 +3,6 @@ package by.ares.orderservice.unit.service;
 import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.SpecificationRequest;
 import by.ares.orderservice.dto.response.OrderDto;
-import by.ares.orderservice.dto.response.UserDto;
 import by.ares.orderservice.exception.OrderNotFoundException;
 import by.ares.orderservice.mapper.OrderMapper;
 import by.ares.orderservice.model.Order;
@@ -50,14 +49,12 @@ class OrderServiceTest {
 
     private Order order;
     private OrderDto orderDto;
-    private UserDto userDto;
 
 
     @BeforeEach
     void setUp() {
         order = buildOrder();
         orderDto = buildOrderDto();
-        userDto = buildUserDto();
     }
 
     @Test
@@ -141,18 +138,29 @@ class OrderServiceTest {
     }
 
     @Test
-    void save_shouldReturnId() {
+    void save_shouldReturnOrder() {
         OrderRequest request = buildOrderRequest();
         when(orderMapper.toModel(request)).thenReturn(order);
         when(orderRepository.save(order)).thenReturn(order);
         when(orderMapper.toDto(order)).thenReturn(orderDto);
-        OrderDto orderDto = orderService.save(request);
-        assertEquals(orderDto, this.orderDto);
+        OrderDto result = orderService.save(request);
+        assertEquals(result, orderDto);
         verify(orderRepository).save(order);
     }
 
     @Test
-    void delete_shouldMarkOrderDeleted() {
+    void update_shouldReturnOrder() {
+        OrderRequest request = buildOrderRequest();
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
+        when(orderRepository.save(order)).thenReturn(order);
+        when(orderMapper.toDto(order)).thenReturn(orderDto);
+        OrderDto result = orderService.update(request, ORDER_ID);
+        assertEquals(result, orderDto);
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void delete_shouldDelete() {
         orderService.delete(ORDER_ID);
         verify(orderRepository).deleteById(any());
     }

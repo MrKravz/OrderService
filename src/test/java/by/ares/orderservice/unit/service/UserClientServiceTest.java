@@ -12,8 +12,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClient;
 
+import java.net.URI;
 import java.util.List;
-import java.util.function.Function;
 
 import static by.ares.orderservice.util.TestConstants.*;
 import static by.ares.orderservice.util.TestModelBuilder.buildChangedUserDto;
@@ -56,7 +56,7 @@ class UserClientServiceTest {
         List<Long> ids = List.of(USER_ID, USER_ID_2);
         List<UserDto> expected = List.of(userDto, changedUserDto);
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
+        when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);

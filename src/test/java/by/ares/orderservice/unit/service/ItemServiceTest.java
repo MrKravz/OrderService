@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemServiceTest {
+class ItemServiceTest {
 
     @Mock
     private ItemRepository itemRepository;
@@ -53,7 +53,7 @@ public class ItemServiceTest {
         Page<Item> itemPage = new PageImpl<>(List.of(item), pageable, 1);
         when(itemRepository.findAll(pageable)).thenReturn(itemPage);
         Page<ItemDto> result = itemService.findAll(pageable);
-        assertEquals(result.getTotalElements(), 1);
+        assertEquals(1, result.getTotalElements());
         verify(itemRepository).findAll(pageable);
     }
 
@@ -69,7 +69,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    void findById_shouldReturnOrder_whenElementExist() {
+    void findById_shouldReturnItem_whenElementExist() {
         when(itemRepository.findById(ITEM_ID)).thenReturn(Optional.of(item));
         when(itemMapper.toDto(item)).thenReturn(itemDto);
         ItemDto result = itemService.findById(ITEM_ID);
@@ -96,10 +96,10 @@ public class ItemServiceTest {
     @Test
     void update_shouldReturnItem() {
         ItemRequest request = buildItemRequest();
-        when(itemMapper.toModel(request)).thenReturn(item);
+        when(itemRepository.findById(ITEM_ID)).thenReturn(Optional.of(item));
         when(itemRepository.save(item)).thenReturn(item);
         when(itemMapper.toDto(item)).thenReturn(itemDto);
-        ItemDto result = itemService.save(request);
+        ItemDto result = itemService.update(request, ITEM_ID);
         assertEquals(result, this.itemDto);
         verify(itemRepository).save(item);
     }

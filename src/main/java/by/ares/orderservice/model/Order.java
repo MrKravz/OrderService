@@ -77,9 +77,7 @@ public class Order {
     public void calculateTotalPrice() {
         totalPrice = DEFAULT_TOTAL_PRICE_VALUE;
         if (getItems().isEmpty()) return;
-        items.forEach(orderItem -> {
-            totalPrice += orderItem.getItem().getPrice() * orderItem.getQuantity();
-        });
+        items.forEach(orderItem -> totalPrice += orderItem.getItem().getPrice() * orderItem.getQuantity());
     }
 
 }

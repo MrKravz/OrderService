@@ -39,14 +39,14 @@ class OrderControllerTest extends AbstractIntegrationTest {
     private Order saveTestOrder() {
         Item item = buildItem();
         itemRepository.save(item);
-        Order order = buildOrder();
+        order = buildOrder();
         OrderItem orderItem = buildOrderItem(order, item, 1);
         order.addOrderItem(orderItem);
         return orderRepository.save(order);
     }
 
     @Test
-    void shouldFindPaymentCardById() throws Exception {
+    void findById_shouldReturnOrder() throws Exception {
         stubFindUserById();
         mockMvc.perform(get("/orders/{id}", order.getId()))
                 .andExpect(status().isOk())
@@ -55,7 +55,7 @@ class OrderControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldCreatePaymentCard() throws Exception {
+    void save_shouldReturnOrder() throws Exception {
         OrderRequest request = buildOrderRequest();
         stubFindUserById();
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
@@ -67,7 +67,7 @@ class OrderControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldUpdatePaymentCard() throws Exception {
+    void update_shouldReturnOrder() throws Exception {
         OrderRequest request = buildOrderRequest();
         request.setStatus(DONE);
         stubFindUserById();
@@ -81,14 +81,14 @@ class OrderControllerTest extends AbstractIntegrationTest {
 
 
     @Test
-    void shouldDeletePaymentCard() throws Exception {
+    void delete_shouldDelete() throws Exception {
         stubFindUserById();
         mockMvc.perform(delete("/orders/{id}", order.getId()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void shouldReturnPage() throws Exception {
+    void findAll_shouldReturnPage() throws Exception {
         saveTestOrder();
         saveTestOrder();
         stubFindAllByIdList();

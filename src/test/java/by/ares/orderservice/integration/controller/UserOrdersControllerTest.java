@@ -34,14 +34,14 @@ class UserOrdersControllerTest extends AbstractIntegrationTest {
     private Order saveTestOrder() {
         Item item = buildItem();
         itemRepository.save(item);
-        Order order = buildOrder();
+        order = buildOrder();
         OrderItem orderItem = buildOrderItem(order, item, 1);
         order.addOrderItem(orderItem);
         return orderRepository.save(order);
     }
 
     @Test
-    void shouldFindPaymentCardById() throws Exception {
+    void findAll_ShouldReturnAllOrderByUserId() throws Exception {
         stubFindUserById();
         mockMvc.perform(get("/users/{userId}/orders", order.getUserId()))
                 .andExpect(status().isOk())

@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ItemControllerTest extends AbstractIntegrationTest {
+class ItemControllerTest extends AbstractIntegrationTest {
 
     @Autowired
     public ItemRepository itemRepository;
@@ -33,7 +33,7 @@ public class ItemControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldFindPaymentCardById() throws Exception {
+    void findById_shouldReturnItem() throws Exception {
         mockMvc.perform(get("/items/{id}", item.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(item.getId()))
@@ -42,7 +42,7 @@ public class ItemControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldCreatePaymentCard() throws Exception {
+    void save_shouldReturnItem() throws Exception {
         ItemRequest request = buildItemRequest();
         mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -54,7 +54,7 @@ public class ItemControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldUpdatePaymentCard() throws Exception {
+    void update_shouldReturnItem() throws Exception {
         ItemRequest request = buildItemRequest();
         request.setName(UPDATED_ITEM_NAME);
         mockMvc.perform(put("/items/{id}", item.getId())
@@ -68,13 +68,13 @@ public class ItemControllerTest extends AbstractIntegrationTest {
 
 
     @Test
-    void shouldDeletePaymentCard() throws Exception {
+    void delete_shouldDelete() throws Exception {
         mockMvc.perform(delete("/items/{id}", item.getId()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void shouldReturnPage() throws Exception {
+    void findAll_shouldReturnPage() throws Exception {
         saveTestItem();
         saveTestItem();
         mockMvc.perform(get("/items?page=0&size=2"))

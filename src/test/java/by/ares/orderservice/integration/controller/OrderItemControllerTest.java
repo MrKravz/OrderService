@@ -35,14 +35,14 @@ class OrderItemControllerTest extends AbstractIntegrationTest {
     private Order saveTestOrder() {
         Item item = buildItem();
         itemId = itemRepository.save(item).getId();
-        Order order = buildOrder();
+        order = buildOrder();
         OrderItem orderItem = buildOrderItem(order, item, 1);
         order.addOrderItem(orderItem);
         return orderRepository.save(order);
     }
 
     @Test
-    void shouldFindPaymentCardById() throws Exception {
+    void addItem_ShouldAddItemToOrder() throws Exception {
         stubFindUserById();
         mockMvc.perform(post("/orders/{orderId}/add-item/{itemId}", order.getId(), itemId))
                 .andExpect(status().isOk())
@@ -51,7 +51,7 @@ class OrderItemControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldFindPaymentCardById1() throws Exception {
+    void removeItem_ShouldAddItemToOrder() throws Exception {
         stubFindUserById();
         mockMvc.perform(post("/orders/{orderId}/remove-item/{itemId}", order.getId(), itemId))
                 .andExpect(status().isOk())
