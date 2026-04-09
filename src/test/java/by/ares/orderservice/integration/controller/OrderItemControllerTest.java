@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static by.ares.orderservice.util.TestConstants.AWAITED;
 import static by.ares.orderservice.util.TestModelBuilder.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +44,7 @@ class OrderItemControllerTest extends AbstractIntegrationTest {
     @Test
     void addItem_ShouldAddItemToOrder() throws Exception {
         stubFindUserById();
-        mockMvc.perform(post("/orders/{orderId}/add-item/{itemId}", order.getId(), itemId))
+        mockMvc.perform(put("/orders/{orderId}/items/{itemId}", order.getId(), itemId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.status").value(AWAITED.toString()));
@@ -53,7 +53,7 @@ class OrderItemControllerTest extends AbstractIntegrationTest {
     @Test
     void removeItem_ShouldAddItemToOrder() throws Exception {
         stubFindUserById();
-        mockMvc.perform(post("/orders/{orderId}/remove-item/{itemId}", order.getId(), itemId))
+        mockMvc.perform(delete("/orders/{orderId}/items/{itemId}", order.getId(), itemId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.status").value(AWAITED.toString()));

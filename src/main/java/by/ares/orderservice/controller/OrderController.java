@@ -4,6 +4,7 @@ import by.ares.orderservice.dto.request.OrderRequest;
 import by.ares.orderservice.dto.request.SpecificationRequest;
 import by.ares.orderservice.dto.response.OrderDto;
 import by.ares.orderservice.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderDto> save(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderDto> save(@Valid @RequestBody OrderRequest orderRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(orderService.save(orderRequest));
@@ -43,7 +44,7 @@ public class OrderController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<OrderDto> update(@PathVariable Long id,
-                                       @RequestBody OrderRequest orderRequest) {
+                                       @Valid @RequestBody OrderRequest orderRequest) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(orderService.update(orderRequest, id));

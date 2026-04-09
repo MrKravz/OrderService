@@ -14,7 +14,7 @@ public class OrderItemController {
 
     private final OrderItemService orderItemService;
 
-    @PostMapping("/add-item/{itemId}")
+    @PutMapping("/items/{itemId}")
     public ResponseEntity<OrderDto> addItem(@PathVariable Long orderId,
                                              @PathVariable Long itemId) {
         return ResponseEntity
@@ -22,7 +22,7 @@ public class OrderItemController {
                 .body(orderItemService.addItemToOrder(orderId, itemId));
     }
 
-    @PostMapping("/remove-item/{itemId}")
+    @DeleteMapping("/items/{itemId}")
     public ResponseEntity<OrderDto> removeItem(@PathVariable Long orderId,
                                                 @PathVariable Long itemId) {
         return ResponseEntity

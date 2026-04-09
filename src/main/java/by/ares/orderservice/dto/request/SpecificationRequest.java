@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -17,5 +18,5 @@ import java.time.LocalDate;
 public class SpecificationRequest {
     private LocalDate minDate;
     private LocalDate maxDate;
-    private Status status;
+    private List<Status> statuses;
 }

@@ -20,9 +20,10 @@ public class OrderSpecificationBuilderService implements SpecificationBuilderSer
                     criteriaBuilder.between(root.get("createdAt"), specificationRequest.getMinDate(),
                             specificationRequest.getMaxDate()));
         }
-        if (specificationRequest.getStatus() != null) {
+        if (specificationRequest.getStatuses() != null && !specificationRequest.getStatuses().isEmpty()) {
             spec.add((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("status"), specificationRequest.getStatus()));
+                    root.get("status").in(specificationRequest.getStatuses())
+            );
         }
         return Specification.allOf(spec);
     }

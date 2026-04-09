@@ -48,7 +48,7 @@ public class ItemServiceImpl implements ItemService {
         var item = itemRepository.findById(id)
                 .orElseThrow( () -> new ItemNotFoundException(ITEM_NOT_FOUND_EXCEPTION));
         item.setName(itemRequest.getName())
-                .setPrice(item.getPrice());
+                .setPrice(itemRequest.getPrice());
         return itemMapper.toDto(itemRepository.save(item));
     }
 
