@@ -6,9 +6,11 @@ import by.ares.orderservice.model.Order;
 import by.ares.orderservice.model.OrderItem;
 import by.ares.orderservice.repository.ItemRepository;
 import by.ares.orderservice.repository.OrderRepository;
+import by.ares.orderservice.service.SecurityValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static by.ares.orderservice.util.TestConstants.AWAITED;
 import static by.ares.orderservice.util.TestModelBuilder.*;
@@ -18,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class UserOrdersControllerTest extends AbstractIntegrationTest {
 
+    @MockitoBean
+    private SecurityValidationService securityValidationService;
     @Autowired
     public ItemRepository itemRepository;
     @Autowired
@@ -43,7 +47,9 @@ class UserOrdersControllerTest extends AbstractIntegrationTest {
     @Test
     void findAll_ShouldReturnAllOrderByUserId() throws Exception {
         stubFindUserById();
-        mockMvc.perform(get("/users/{userId}/orders", order.getUserId()))
+        mockMvc.perform(get("/users/{userId}/orders", order.getUserId())
+                        .header("X-User-Id", 1L)
+                        .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").exists())

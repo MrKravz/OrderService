@@ -31,4 +31,4 @@ resilience4j.bulkhead:
       maxConcurrentCalls: 5
 api:
   user:
-    uri: ${USER_URI:}
+    uri: ${USER_SERVICE_URL:}
