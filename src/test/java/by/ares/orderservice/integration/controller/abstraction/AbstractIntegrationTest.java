@@ -1,5 +1,6 @@
 package by.ares.orderservice.integration.controller.abstraction;
 
+import by.ares.orderservice.config.NoSecurityConfig;
 import by.ares.orderservice.util.TestcontainersConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,7 +27,8 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 
 
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@ActiveProfiles("test")
+@Import({TestcontainersConfiguration.class, NoSecurityConfig.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AbstractIntegrationTest {
 

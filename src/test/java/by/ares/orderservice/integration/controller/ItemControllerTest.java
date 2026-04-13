@@ -4,10 +4,12 @@ import by.ares.orderservice.dto.request.ItemRequest;
 import by.ares.orderservice.integration.controller.abstraction.AbstractIntegrationTest;
 import by.ares.orderservice.model.Item;
 import by.ares.orderservice.repository.ItemRepository;
+import by.ares.orderservice.service.SecurityValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static by.ares.orderservice.util.TestConstants.*;
 import static by.ares.orderservice.util.TestModelBuilder.buildItem;
@@ -18,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class ItemControllerTest extends AbstractIntegrationTest {
 
+    @MockitoBean
+    private SecurityValidationService securityValidationService;
     @Autowired
     public ItemRepository itemRepository;
 

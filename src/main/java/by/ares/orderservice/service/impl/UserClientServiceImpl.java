@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -50,6 +53,12 @@ public class UserClientServiceImpl implements ApiClientService {
         idList.forEach(id -> builder.queryParam("usersId", id));
         return restClient.get()
                 .uri(builder.build().toUri())
+                .headers(headers -> {
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+                        headers.setBearerAuth(jwt.getTokenValue());
+                    }
+                })
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
                     ExceptionResponse error;
@@ -65,7 +74,7 @@ public class UserClientServiceImpl implements ApiClientService {
     }
 
     private List<UserDto> fallbackFindAllByIdList(List<Long> idList, Throwable t) {
-        throw new ExternalApiException("Can't access api");
+        throw new ExternalApiException("Can't access api" + t.getMessage());
     }
 
     @Override
@@ -75,21 +84,31 @@ public class UserClientServiceImpl implements ApiClientService {
     public UserDto findUserById(Long id) {
         return restClient.get()
                 .uri(uri + "/" + id)
+                .headers(headers -> {
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+                        headers.setBearerAuth(jwt.getTokenValue());
+                    }
+                })
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
                     ExceptionResponse error;
                     try (InputStream is = res.getBody()) {
+                        if (is == null) {
+                            throw new ExternalApiException("Empty response from user-service");
+                        }
                         error = objectMapper.readValue(is, ExceptionResponse.class);
                     } catch (IOException e) {
                         throw new ResponseParseException(RESPONSE_PARSE_MESSAGE);
                     }
+
                     throw new ExternalApiException(error.getMessage());
                 })
                 .body(UserDto.class);
     }
 
     private UserDto fallbackFindUserById(Long id, Throwable t) {
-        throw new ExternalApiException("Can't access api");
+        throw new ExternalApiException("Can't access api" + t.getMessage());
     }
 
 }
