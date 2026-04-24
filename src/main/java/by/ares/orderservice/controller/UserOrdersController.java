@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{userId}/orders")
+@RequestMapping("/orders/users/{userId}")
 public class UserOrdersController {
 
     private final OrderService orderService;
@@ -25,7 +25,7 @@ public class UserOrdersController {
         securityValidationService.validateAccess(id, userId, role);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(orderService.findAllByUserId(userId));
+                .body(orderService.findAllByUserId(id));
     }
 
 }

@@ -38,9 +38,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.DELETE, "/items/**")
                         .hasRole(Role.ADMIN.toString())
-                        .requestMatchers( HttpMethod.PATCH,"/items/**")
-                        .hasRole(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.PUT, "/items/**")
+                        .hasRole(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST, "/items/**")
                         .hasRole(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET, "/orders")
                         .hasRole(Role.ADMIN.toString())
