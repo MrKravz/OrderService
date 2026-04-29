@@ -1,4 +1,4 @@
-package by.ares.orderservice.service;
+package by.ares.orderservice.service.impl;
 
 import by.ares.orderservice.dto.request.OrderStatusRequest;
 import by.ares.orderservice.exception.OrderNotFoundException;
@@ -6,6 +6,7 @@ import by.ares.orderservice.model.Order;
 import by.ares.orderservice.model.PaymentStatus;
 import by.ares.orderservice.model.Status;
 import by.ares.orderservice.repository.OrderRepository;
+import by.ares.orderservice.service.MessageReceiverService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

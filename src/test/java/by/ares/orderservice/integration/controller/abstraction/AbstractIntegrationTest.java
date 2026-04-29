@@ -1,7 +1,7 @@
 package by.ares.orderservice.integration.controller.abstraction;
 
 import by.ares.orderservice.config.NoSecurityConfig;
-import by.ares.orderservice.util.TestcontainersConfiguration;
+import by.ares.orderservice.config.TestcontainersConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.AfterAll;
@@ -53,6 +53,7 @@ public abstract class AbstractIntegrationTest {
     @DynamicPropertySource
     static void setUserUri(DynamicPropertyRegistry registry) {
         registry.add("api.user.uri", () -> wireMockServer.baseUrl() + "/users");
+        registry.add("TOPIC_NAME", () -> "CREATE_PAYMENT");
     }
 
     protected void stubFindUserById() {

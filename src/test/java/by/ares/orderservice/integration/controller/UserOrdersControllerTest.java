@@ -47,7 +47,7 @@ class UserOrdersControllerTest extends AbstractIntegrationTest {
     @Test
     void findAll_ShouldReturnAllOrderByUserId() throws Exception {
         stubFindUserById();
-        mockMvc.perform(get("/users/{userId}/orders", order.getUserId())
+        mockMvc.perform(get("/orders/users/{userId}", order.getUserId())
                         .header("X-User-Id", 1L)
                         .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())

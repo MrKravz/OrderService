@@ -16,7 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static by.ares.orderservice.util.TestConstants.AWAITED;
-import static by.ares.orderservice.util.TestConstants.DONE;
+import static by.ares.orderservice.util.TestConstants.CONFIRMED;
 import static by.ares.orderservice.util.TestModelBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -77,7 +77,7 @@ class OrderControllerTest extends AbstractIntegrationTest {
     @Test
     void update_shouldReturnOrder() throws Exception {
         OrderRequest request = buildOrderRequest();
-        request.setStatus(DONE);
+        request.setStatus(CONFIRMED);
         stubFindUserById();
         mockMvc.perform(patch("/orders/{id}", order.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +86,7 @@ class OrderControllerTest extends AbstractIntegrationTest {
                         .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.status").value(DONE.toString()));
+                .andExpect(jsonPath("$.status").value(CONFIRMED.toString()));
     }
 
 

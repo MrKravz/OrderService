@@ -11,7 +11,8 @@ spring:
       group-id: order-group-id
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.default.type: "by.ares.orderservice.dto.request.OrderStatusRequest"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: "by.ares.orderservice.dto.request.OrderStatusRequest"
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_DOCKER_URL}
