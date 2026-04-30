@@ -36,6 +36,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/items/**")
                         .hasRole(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.PUT, "/items/**")
