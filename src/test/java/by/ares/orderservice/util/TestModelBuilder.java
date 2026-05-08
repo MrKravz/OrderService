@@ -2,7 +2,7 @@ package by.ares.orderservice.util;
 
 import by.ares.orderservice.dto.request.ItemRequest;
 import by.ares.orderservice.dto.request.OrderRequest;
-import by.ares.orderservice.dto.request.StatusRequest;
+import by.ares.orderservice.dto.request.OrderStatusRequest;
 import by.ares.orderservice.dto.response.ItemDto;
 import by.ares.orderservice.dto.response.OrderDto;
 import by.ares.orderservice.dto.response.UserDto;
@@ -80,9 +80,10 @@ public class TestModelBuilder {
                 .build();
     }
 
-    public static StatusRequest buildStatusRequest() {
-        return StatusRequest.builder()
-                .status(AWAITED)
+    public static OrderStatusRequest buildOrderStatusRequest() {
+        return OrderStatusRequest.builder()
+                .id(ORDER_ID)
+                .status(SUCCESS)
                 .build();
     }
 

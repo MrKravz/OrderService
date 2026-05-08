@@ -57,6 +57,7 @@ class UserClientServiceTest {
         List<UserDto> expected = List.of(userDto, changedUserDto);
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(expected);
@@ -68,6 +69,7 @@ class UserClientServiceTest {
     void shouldReturnUserByIdSuccessfully() {
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(UserDto.class)).thenReturn(userDto);

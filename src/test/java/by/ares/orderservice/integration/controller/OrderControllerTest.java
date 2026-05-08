@@ -7,14 +7,16 @@ import by.ares.orderservice.model.Order;
 import by.ares.orderservice.model.OrderItem;
 import by.ares.orderservice.repository.ItemRepository;
 import by.ares.orderservice.repository.OrderRepository;
+import by.ares.orderservice.service.SecurityValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static by.ares.orderservice.util.TestConstants.AWAITED;
-import static by.ares.orderservice.util.TestConstants.DONE;
+import static by.ares.orderservice.util.TestConstants.CONFIRMED;
 import static by.ares.orderservice.util.TestModelBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class OrderControllerTest extends AbstractIntegrationTest {
 
+    @MockitoBean
+    private SecurityValidationService securityValidationService;
     @Autowired
     public ItemRepository itemRepository;
     @Autowired
@@ -48,7 +52,9 @@ class OrderControllerTest extends AbstractIntegrationTest {
     @Test
     void findById_shouldReturnOrder() throws Exception {
         stubFindUserById();
-        mockMvc.perform(get("/orders/{id}", order.getId()))
+        mockMvc.perform(get("/orders/{id}", order.getId())
+                        .header("X-User-Id", 1L)
+                        .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.status").value(AWAITED.toString()));
@@ -60,7 +66,9 @@ class OrderControllerTest extends AbstractIntegrationTest {
         stubFindUserById();
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-User-Id", 1L)
+                        .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.status").value(AWAITED.toString()));
@@ -69,14 +77,16 @@ class OrderControllerTest extends AbstractIntegrationTest {
     @Test
     void update_shouldReturnOrder() throws Exception {
         OrderRequest request = buildOrderRequest();
-        request.setStatus(DONE);
+        request.setStatus(CONFIRMED);
         stubFindUserById();
         mockMvc.perform(patch("/orders/{id}", order.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-User-Id", 1L)
+                        .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.status").value(DONE.toString()));
+                .andExpect(jsonPath("$.status").value(CONFIRMED.toString()));
     }
 
 
